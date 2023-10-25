@@ -13,7 +13,7 @@ export class Invoice {
      * @returns
      */
     public static createMemo(linkId: string, buyer: string) {
-        throw new Error("Exercise! Replace me to pass tests!");
+        return `buy_${linkId}_${buyer}`
     }
 
     /**
@@ -28,7 +28,9 @@ export class Invoice {
         remoteSignature: string,
         sats: number,
     ): Buffer {
-        throw new Error("Exercise! Replace me to pass tests!");
+        const concatenatedString = localSignature + remoteSignature + sats.toString();
+        const preimage = sha256(Buffer.from(concatenatedString));
+        return preimage;
     }
 
     constructor(

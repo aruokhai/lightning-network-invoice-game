@@ -1,5 +1,7 @@
 import { Link } from "./Link";
 import { IMessageSigner } from "./IMessageSigner";
+import { Invoice } from "./Invoice";
+import { link } from "fs";
 
 export class LinkFactory {
     constructor(readonly signer: IMessageSigner) {}
@@ -11,7 +13,9 @@ export class LinkFactory {
      * @returns
      */
     public async createFromSeed(seed: string, startSats: number): Promise<Link> {
-        throw new Error("Exercise! Replace me to pass tests!");
+        const signedMessage = await this.signer.sign(seed);
+        return new Link(seed, signedMessage, startSats)
+
     }
 
     /**
@@ -25,6 +29,8 @@ export class LinkFactory {
      * @returns
      */
     public async createFromSettled(settled: Link): Promise<Link> {
-        throw new Error("Exercise! Replace me to pass tests!");
+        const signature  = await this.signer.sign(settled.invoice.preimage);
+        const newAmount  = Number(settled.invoice.valueSat) + 1;
+        return new Link(settled.invoice.preimage, signature, newAmount)
     }
 }

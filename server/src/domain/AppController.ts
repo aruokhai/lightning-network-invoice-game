@@ -28,7 +28,9 @@ export class AppController {
      * @param startSats
      */
     public async start(seed: string, startSats: number) {
-        throw new Error("Exercise! Replace me to pass tests!");
+        const newLink = await this.linkFactory.createFromSeed(seed, startSats);
+        this.chain.push(newLink);
+        this.invoiceDataMapper.sync(invoice => this.handleInvoice(invoice));
     }
 
     /**
@@ -38,17 +40,11 @@ export class AppController {
      */
     public async handleInvoice(invoice: Invoice) {
         if (invoice.settles(this.chainTip)) {
-            throw new Error("Exercise! Replace me to pass tests!");
-
-            // capture and settle the current chain tip
-            let settled;
-
+            let settled = this.chainTip;
+            settled.settle(invoice);
             // create a new unsettled Link using the LinkFactory
-            let nextLink;
-
-            // add the new link to the chain
-
-            // send to
+            let nextLink = await this.linkFactory.createFromSettled(settled);
+            this.chain.push(nextLink);
             if (this.listener) {
                 this.listener([settled, nextLink]);
             }
@@ -75,14 +71,12 @@ export class AppController {
         // Use `Invoice.createPreimage` to create the preimage. Hint the
         // the `localSignature` is available on the `chaintip` and the
         // `remoteSignature` and `sats` are arguments to this method.
-        throw new Error("Exercise! Replace me to pass tests!");
-        let preimage: Buffer;
+        let preimage: Buffer = Invoice.createPreimage(this.chainTip.localSignature, remoteSignature, sats);
 
         // Use `Invoice.createMemo` to create the memo. Hint the `linkId`
         // is available on the `chaintip` and the buyer is the `pubkey`
         // obtained in the signature verification.
-        throw new Error("Exercise! Replace me to pass tests!");
-        let memo: string;
+        let memo: string = Invoice.createMemo(this.chainTip.linkId, verification.pubkey);
 
         // try to create the invoice
         try {
